@@ -4,10 +4,27 @@
 import RPi.GPIO as GPIO
 import MFRC522
 import signal
+import requests
 
 continue_reading = True
 
 # Capture SIGINT for cleanup when the script is aborted
+
+products = {"163,119,194,4":"Cookie 3.50", "243,17,70,166":"Ruffles 7.00"}  # products
+url = "http://192.168.2.104:7777/publish/topico"
+
+
+def send_data(rfid):
+    prod = products[rfid]
+    print("Product: ", prod)
+    try:
+        response = requests.post(url, data=prod)
+        if response.status_code == 200:
+            print("Sended")
+        else:
+            print("Fail")
+    except Exception as err:
+        print(err)
 
 
 def end_read(signal, frame):
@@ -32,6 +49,7 @@ print("Press Ctrl-C to stop.")
 # Scan for cards
 (status, TagType) = MIFAREReader.Request(MIFAREReader.PICC_REQIDL)
 
+print("status ", status, " Tag ", TagType)
 # If a card is found
 if status == MIFAREReader.MI_OK:
     print("Card detected")
@@ -44,7 +62,7 @@ if status == MIFAREReader.MI_OK:
 
     # Print UID
     print("Card read UID: " + str(uid[0]) + "," + str(uid[1]) + "," + str(uid[2]) + "," + str(uid[3]))
-
+    send_data(str(uid[0]) + "," + str(uid[1]) + "," + str(uid[2]) + "," + str(uid[3]))
     # This is the default key for authentication
     key = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
 
@@ -59,3 +77,5 @@ if status == MIFAREReader.MI_OK:
         for byte in block:
             b += chr(byte)
         print(b)
+GPIO.cleanup()
+
