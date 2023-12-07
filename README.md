@@ -1,6 +1,10 @@
 # smart_cart
 in progress
 
+# App
+
+![image](https://github.com/PyMarcus/smart_cart/assets/88283829/82051356-a35b-4151-b210-eb4e36777bb0)
+
 
 # Model
 
