@@ -1,6 +1,14 @@
 # smart_cart
 in progress
 
+# Working:
+
+
+
+https://github.com/PyMarcus/smart_cart/assets/88283829/957bb458-3d86-4845-8247-1787fe654698
+
+
+
 # App
 
 ![image](https://github.com/PyMarcus/smart_cart/assets/88283829/82051356-a35b-4151-b210-eb4e36777bb0)
