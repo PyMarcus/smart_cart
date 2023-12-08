@@ -1,6 +1,7 @@
 # smart_cart
-in progress
 
+ Escaneou. Registrou. Economizou! 
+ 
 # Working:
 
 
