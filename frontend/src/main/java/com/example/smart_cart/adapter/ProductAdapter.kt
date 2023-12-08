@@ -15,6 +15,7 @@ class ProductAdapter(var products: MutableList<ProductEntity>,var context: Conte
 RecyclerView.Adapter<ProductAdapter.ProductItemHolder>(){
 
     val productController = ProductController(context)
+    var sum = 0.00
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -42,7 +43,6 @@ RecyclerView.Adapter<ProductAdapter.ProductItemHolder>(){
     }
 
     private fun total(newList: MutableList<ProductEntity>): Double{
-        var sum = 0.00
         for(product in newList){
             sum += product.price
         }

@@ -3,6 +3,8 @@ package com.example.smart_cart
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.View.OnClickListener
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +15,11 @@ import com.example.smart_cart.controllers.ProductController
 import com.example.smart_cart.databinding.ActivityContentBinding
 import com.example.smart_cart.databinding.ActivityProductBinding
 import com.example.smart_cart.models.ProductEntity
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 class ContentActivity : AppCompatActivity() , OnClickListener{
 
@@ -21,6 +28,9 @@ class ContentActivity : AppCompatActivity() , OnClickListener{
     private lateinit var adapter: ProductAdapter
     private lateinit var productBinding: ActivityProductBinding
     private lateinit var viewModel: ProductViewModel
+    private lateinit var request:Runnable
+    private lateinit var handler: Handler
+    private lateinit var apiRunnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,9 +42,17 @@ class ContentActivity : AppCompatActivity() , OnClickListener{
         // instances
         productController = ProductController(baseContext)
 
-        adapter = ProductAdapter(mutableListOf(ProductEntity("teste", 3.50)), baseContext, this)
-        binding.recycle.adapter = adapter
-        this.handleClickEvents()
+        // call api in background without break
+        handler = Handler(Looper.getMainLooper())
+        apiRunnable = object : Runnable{
+            override fun run() {
+                communicateWithQueueInBackground()
+                handler.postDelayed(this, 1000)
+            }
+        }
+        handler.post(apiRunnable)
+        handleClickEvents()
+
     }
 
     fun updateTotal(newTotal: Double){
@@ -62,5 +80,27 @@ class ContentActivity : AppCompatActivity() , OnClickListener{
                 finish()
             }
         }
+    }
+
+    private fun communicateWithQueueInBackground() {
+        val url: String = "http://localhost:8080/products/topico"
+        val uri = URL(url)
+
+        Thread {
+            try {
+                val req: HttpsURLConnection = uri.openConnection() as HttpsURLConnection
+                val buffer = BufferedReader(InputStreamReader(req.inputStream))
+                val response = buffer.read()
+                println("RESPONSE $response")
+                // Update the UI on the main thread
+                runOnUiThread {
+
+                    //adapter.updateList(newProductList)
+                    //adapter.notifyDataSetChanged()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }.start()
     }
 }
